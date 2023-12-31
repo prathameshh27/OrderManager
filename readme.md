@@ -93,7 +93,7 @@ The application will be accessible at http://127.0.0.1:8080/.
 Navigate to the project folder and install the dependencies using pip:
 
 ```shell
-pip install -r requirements.txt     # skip
+pip install -r requirements.txt
 ```
 
 4. #### configure the .env file (root dir).
