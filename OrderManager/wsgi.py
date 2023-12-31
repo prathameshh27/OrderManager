@@ -11,6 +11,16 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'OrderManager.settings')
+from .settings import base_settings
+
+# set postgres as the default database
+os.environ.setdefault('DB_TYPE', 'postgres')
+
+# Based on the DEBUG flag, the application will automatically switch between local and prod settings
+if base_settings.DEBUG:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'OrderManager.settings.local_settings')
+else:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'OrderManager.settings.prod_settings')
+
 
 application = get_wsgi_application()

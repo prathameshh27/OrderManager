@@ -30,11 +30,10 @@ SECRET_KEY = 'django-insecure-m5ym7$p0++8rssdn6t)_)=0srnhwcv^h3bhc*616a&qyga5!sk
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 DEBUG = os.getenv('DEBUG') == "True"
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -129,6 +128,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': """The Order Management Application is a web service designed to facilitate the creation and management of purchase orders.<br>It provides a RESTful interface for handling order-related operations, such as create, update, list, describe and delete""",
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    # 'SCHEMA_PATH_PREFIX': '',
 }
 
 

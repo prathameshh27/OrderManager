@@ -9,5 +9,5 @@ router.register(r"token/refresh", ObtainAccessToken, basename="refresh_token")
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include(router.urls), name='Token Based Auth'),
 ]

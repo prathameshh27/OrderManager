@@ -3,12 +3,39 @@ from django.contrib.auth import authenticate
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_spectacular.utils import extend_schema
 
-from ..serializers.auth_serializer import LoginSerializer
+from ..serializers.auth_serializer import (
+    TokenPairResSerializer, AccessTokenResSerializer, 
+    TokenPairSerializer, RefreshTokenSerializer)
 
 
 
 IST_TZ = getattr(settings, 'IST_TZ', None)
+
+
+class TokenPairSpecs:
+    """OpenAPI specifications for the Auth Token API endpoints"""
+    create = {
+        "request": TokenPairSerializer, 
+        "responses": TokenPairResSerializer,
+        "description": """<h2>Get bearer token</h2>
+                        Allows the user to retrive a bearer token for accessing the API endpoints.
+                        Accepts username and password.""",
+    }
+
+
+class AccessTokenSpecs:
+    """OpenAPI specifications for the Refresh Token API endpoints"""
+    create = {
+        "request": RefreshTokenSerializer, 
+        "responses": AccessTokenResSerializer,
+        "description": """<h2>Refresh access token</h2>
+                        Allows the user to refresh the short persistent access token for accessing the API endpoints.
+                        Accepts a Refresh token previously obtained from Auth token API endpoint.""",
+    }
+
+
 
 
 class ObtainTokenPair(viewsets.ViewSet):
@@ -19,13 +46,14 @@ class ObtainTokenPair(viewsets.ViewSet):
     def get_view_name(self):
         return self.page_name
 
+    @extend_schema(**TokenPairSpecs.create,)
     def create(self, request):
         """Login - POST Endpoint"""
 
         self.page_name = "Get Bearer Token"
         post_data = request.data
 
-        login_serializer = LoginSerializer(data=post_data)
+        login_serializer = TokenPairSerializer(data=post_data)
         login_serializer.is_valid(raise_exception=True)
 
         username = login_serializer.data.get('username')
@@ -60,7 +88,9 @@ class ObtainTokenPair(viewsets.ViewSet):
             return Response({
                 'error' : 'Login failed. Please supply a valid username and password'
             }, 400)
-        
+
+
+
 
 class ObtainAccessToken(viewsets.ViewSet):
     """RefreshToken API"""
@@ -69,6 +99,7 @@ class ObtainAccessToken(viewsets.ViewSet):
     def get_view_name(self):
         return self.page_name
 
+    @extend_schema(**AccessTokenSpecs.create)
     def create(self, request):
         """RefreshToken - POST Endpoint"""
 
