@@ -6,6 +6,7 @@ from .supplier_serializer import SupplierSerializer
 class LineItemSerializer(serializers.ModelSerializer):
     """Generic Purchase Order Items Serializer"""
     class Meta:
+        """Properties"""
         model = LineItem
         # exclude = ('purchase_order',)
         fields = ("id", "item_name", "quantity", "price_without_tax", "tax_name", "tax_amount", "line_total")
@@ -21,6 +22,7 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
     """Generic Purchase Order Serializer"""
 
     class Meta:
+        """Properties"""
         depth = 1
         model = PurchaseOrder
 
@@ -51,12 +53,12 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
 
         for indx, item in enumerate(line_items):
             item = dict(item)
-                
+
             line_qty = int(item.get("quantity", 0))
             total_gross_amount = line_qty * float(item.get("price_without_tax", 0))
             total_tax_amount = line_qty * float(item.get("tax_amount", 0))
             total_line_amount = total_gross_amount + total_tax_amount
-            
+
             item["line_total"] = total_line_amount
             item["purchase_order"] = order_instance
 
@@ -101,24 +103,22 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
 
 
 
-    def _upsert_supplier(self, supplier_data):
+    def _upsert_supplier(self, supplier_data:dict) -> object:
         supplier_serializer = SupplierSerializer(data=supplier_data)
         supplier_serializer.is_valid(raise_exception=True)
         supplier = supplier_serializer.save()
         return supplier
 
 
-    def create(self, validated_data):
+    def create(self, validated_data) -> object:
         """Create and return a new PurchaseOrder instance."""
 
         line_items = validated_data.get('line_items', [])
         supplier_data = validated_data.get("supplier")
 
-        print(line_items)
-
         supplier = self._upsert_supplier(supplier_data)
         order_instance = PurchaseOrder(supplier=supplier)
-        
+
         order_header, line_items = self._process_line_items(line_items, order_instance, method="create")
         order_instance.update_fields(**order_header)
 
@@ -127,16 +127,16 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
         LineItem.objects.bulk_create(line_items)
 
         return order_instance
-    
+
 
 
     def update(self, order_instance, validated_data):
         """Update and return an existing PurchaseOrder instance."""
-        
+
         line_items = validated_data.get('line_items', [])
         supplier_data = validated_data.get("supplier")
 
-        
+
         order_header, line_items = self._process_line_items(line_items, order_instance, method="update")
         order_header["supplier"] = self._upsert_supplier(supplier_data)
 

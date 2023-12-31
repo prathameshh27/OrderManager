@@ -15,9 +15,9 @@ class TestPurchaseOrderModel:
         assert purchase_order.__str__() == "PO#1234"
 
 
-# class TestLineItemModel:
-#     def test_str_method(self, line_item_factory):
-#         line_item = line_item_factory()
-#         assert line_item.__str__() == "PO#1234 - LineItem: liabc1, Item: SKU987"
+class TestLineItemModel:
+    def test_str_method(self, line_item_factory):
+        line_item = line_item_factory()
+        assert line_item.__str__() == "PO#1234 - LineItem: liabc1, Item: SKU987"
 
 

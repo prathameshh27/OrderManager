@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 *.sqlite3
 /OrderManager/*.sqlite3
+/usr

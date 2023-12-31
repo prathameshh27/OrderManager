@@ -1,8 +1,11 @@
 from django.db import models
 
 class DocumentCounter(models.Model):
+    """Maintains a running counter for the documents"""
 
     class DocType(models.TextChoices):
+        """Supported Documents"""
+
         ORDER = "ORDER"
         INVOICE = "INVOICE"
 
@@ -10,4 +13,5 @@ class DocumentCounter(models.Model):
     document_number = models.IntegerField(null=True, blank=True, default=1)
 
     def get_id(self):
+        """Get instance id"""
         return self.id

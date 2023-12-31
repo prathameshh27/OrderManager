@@ -1,10 +1,39 @@
+# ++++++++++++++++++++++
+# Schema: PurchaseOrder
+# ++++++++++++++++++++++
+# pk: int (primary key)     <= For security reason, used alpha-numeric UUID
+# supplier: int (foreign key)
+# order_time: datetime (auto generated)
+# order_number: int (auto generated)
+# total_quantity: int
+# total_amount: decimal
+# total_tax: decimal
+
+
+
+# ++++++++++++++++++++++
+# Schema: LineItem
+# ++++++++++++++++++++++
+# pk: int (primary key)     <= For security reason, used alpha-numeric UUID
+# item_name: string
+# quantity: int (greater than 0)
+# price_without_tax: decimal (greater or equal to 0)
+# tax_name: string
+# tax_amount: decimal (greater or equal to 0)
+# line_total: decimal (greater or equal to 0
+# purchase_order: int (foreign key)
+
+
+
 from django.db import models
 from django.db.models import Q
 from lib.utils.model_functions import custom_id, set_doc_number
 
 class PurchaseOrder(models.Model):
+    """Purchase order header"""
 
     class Meta:
+        """Properties"""
         ordering = ('-order_number',)
 
     id = models.CharField(primary_key=True, unique=True, editable=False, default=custom_id, max_length=11)
@@ -49,6 +78,7 @@ class PurchaseOrder(models.Model):
         try:
             order = cls.objects.get(id=id)
         except Exception as excp:
+            _ = excp
             order = None
         return order
     
@@ -66,12 +96,17 @@ class PurchaseOrder(models.Model):
         return order
 
 
+#####################################################################################
+# Line Items
+#####################################################################################
 
 
     
 class LineItem(models.Model):
-
+    """Line item details"""
+    
     class Meta:
+        """Properties"""
         ordering = ('purchase_order',)
 
     id = models.CharField(primary_key=True, unique=True, editable=False, default=custom_id, max_length=11)
@@ -86,7 +121,6 @@ class LineItem(models.Model):
 
 
     def save(self, *args, **kwargs):
-        
         self.line_total = self.calc_line_total()
         super().save(*args, **kwargs)
 
@@ -108,34 +142,3 @@ class LineItem(models.Model):
         self.tax_amount = kwargs.get("tax_amount", self.tax_amount)
         self.line_total = kwargs.get("line_total", self.line_total)
         self.price_without_tax = kwargs.get("price_without_tax", self.price_without_tax)
-
-
-
-
-
-# ++++++++++++++++++++++
-# Schema: PurchaseOrder
-# ++++++++++++++++++++++
-# pk: int (primary key)     <= For security reason, used alpha-numeric UUID
-# supplier: int (foreign key)
-# order_time: datetime (auto generated)
-# order_number: int (auto generated)
-# total_quantity: int
-# total_amount: decimal
-# total_tax: decimal
-
-
-
-
-
-# ++++++++++++++++++++++
-# Schema: LineItem
-# ++++++++++++++++++++++
-# pk: int (primary key)     <= For security reason, used alpha-numeric UUID
-# item_name: string
-# quantity: int (greater than 0)
-# price_without_tax: decimal (greater or equal to 0)
-# tax_name: string
-# tax_amount: decimal (greater or equal to 0)
-# line_total: decimal (greater or equal to 0
-# purchase_order: int (foreign key)

@@ -1,13 +1,13 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth.models import User
-from django.test import TestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.home.models.supplier import Supplier
 
 
 class PurchaseOrderAPITestCase(APITestCase):
+    """Purchase order Testing module"""
     def setUp(self):
         
         super().setUp()
@@ -34,7 +34,6 @@ class PurchaseOrderAPITestCase(APITestCase):
 
         # Test Order 2
         self.order2_id, self.order2_item_id = None, None
-
         self.order2 = {
             'supplier': {'id': self.supplier.id, 'name': 'New Supplier', 'email': 'newsupplier@gmail.com'},
             'line_items': [
@@ -61,17 +60,18 @@ class PurchaseOrderAPITestCase(APITestCase):
 
     def test_a_create_orders(self):
         """create_purchase_order : Checks Order creation, Supplier updation, Calculation at order header and line level"""
-        print("""==========================create_purchase_order==========================""")
 
         # self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/v1/purchase/order/', data=self.order1, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+        # Create order
         response = self.client.post('/api/v1/purchase/order/', data=self.order2, format='json')
 
         supplier_name = response.data['supplier']['name']
         supplier_email = response.data['supplier']['email']
 
+        # Old order had a diffrent supplier
         self.assertEqual(supplier_name, "New Supplier")
         self.assertEqual(supplier_email, "newsupplier@gmail.com")
 
@@ -80,6 +80,7 @@ class PurchaseOrderAPITestCase(APITestCase):
         total_tax = response.data['total_tax']
         item_total = response.data['line_items'][0]['line_total']
 
+        # Check calculations
         self.assertEqual(total_amount, "4496.80")
         self.assertEqual(total_quantity, 28)
         self.assertEqual(total_tax, "408.80")
@@ -91,7 +92,6 @@ class PurchaseOrderAPITestCase(APITestCase):
 
     def test_b_list_orders(self):
         """list_purchase_order : Checks no. of orders received on using and not using filters"""
-        print("""==========================list_purchase_order==========================""")
 
         # self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/v1/purchase/order/', data=self.order3, format='json')
@@ -104,7 +104,6 @@ class PurchaseOrderAPITestCase(APITestCase):
 
         # Get all orders where item_name=EAN
         response = self.client.get('/api/v1/purchase/order/?item_name=UPC')
-        print(response)
         self.assertEqual(len(response.data), 1)
 
         # Get all orders where supplier_name=Stark
@@ -122,10 +121,8 @@ class PurchaseOrderAPITestCase(APITestCase):
 
     def test_c_update_order(self):
         """update_purchase_order : Checks success of the request, line item count"""
-        print("""==========================update_purchase_order==========================""")
-        
-        # self.client.force_authenticate(user=self.user)
 
+        # Create order
         response = self.client.post('/api/v1/purchase/order/', data=self.order2, format='json')
         self.order2_id = response.data['id']
         self.order2_item_id = response.data['line_items'][0]['id']
@@ -137,9 +134,9 @@ class PurchaseOrderAPITestCase(APITestCase):
             ]
         }
 
-        
+        # Update order 
         response = self.client.put(f'/api/v1/purchase/order/{self.order2_id}/', data=update_data, format='json')
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['line_items']), 1)
 
@@ -147,12 +144,9 @@ class PurchaseOrderAPITestCase(APITestCase):
 
     def test_d_delete_order(self):
         """delete_purchase_order : Checks if the order is deleted"""
-        print("""==========================delete_purchase_order==========================""")
 
-        # self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/v1/purchase/order/', data=self.order2, format='json')
         self.order2_id = response.data['id']
 
         response = self.client.delete(f'/api/v1/purchase/order/{self.order2_id}/')
-        x = self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

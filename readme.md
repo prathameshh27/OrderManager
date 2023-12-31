@@ -64,7 +64,7 @@ DB_TYPE = postgres
 docker-compose up --build
 ```
 
-The application will be accessible at http://127.0.0.1:8000/.
+The application will be accessible at http://127.0.0.1:8080/.
 
 ## Installation (Local test server)
 
@@ -118,10 +118,17 @@ Start the Django development server:
 
 ```shell
 python manage.py migrate
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8080
 ```
-The application will be accessible at http://127.0.0.1:8000/.
+The application will be accessible at http://127.0.0.1:8080/.
 
+
+## API Specifications
+The API specifications for the application are available at the below endpoints:  
+```
+/api/schema/swagger/
+/api/schema/redoc/ 
+```
 
 ## Authentication
 This section describes the available API endpoints for Authentication, their purposes, and the expected input and output data for each operation.
@@ -133,9 +140,9 @@ Allows the user to retrieve a bearer token for accessing the API endpoints. Acce
 - **URL:** `/api/auth/token/`
 - **Method:** `POST`
 - **Security:**
-  - Basic Auth
-  - Cookie Auth
-  - JWT Auth
+  - None
+
+
 
 #### Request Body
 
@@ -168,9 +175,8 @@ Allows the user to refresh the short persistent access token for accessing the A
 - **URL:** `/api/auth/token/refresh/`
 - **Method:** `POST`
 - **Security:**
-  - Basic Auth
-  - Cookie Auth
-  - JWT Auth
+  - None
+
 
 #### Request Body
 
@@ -206,6 +212,13 @@ Allows the user to retrieve all existing purchase orders along with the line ite
 - **Query Parameters:**
   - `item_name`: filter by item name
   - `supplier_name`: filter by supplier name
+
+
+#### Header
+```
+Authorization: Bearer access_token
+```
+
 
 #### Response
 
@@ -246,6 +259,12 @@ Allows the user to create a new purchase order. Accepts multiple line items and 
 - **Method:** `POST`
 - **Security:**
   - JWT Auth
+
+#### Header
+
+```
+Authorization: Bearer access_token
+```
 
 #### Request Body
 
@@ -307,6 +326,12 @@ Allows the user to retrieve an existing purchase order with a purchase order ID.
 - **Path Parameter:**
   - `id`: purchase order ID
 
+#### Header
+
+```
+Authorization: Bearer access_token
+```
+
 #### Response
 
 ```json
@@ -346,6 +371,12 @@ Allows the user to update an existing purchase order. Accepts multiple line item
   - JWT Auth
 - **Path Parameter:**
   - `id`: purchase order ID
+
+#### Header
+
+```
+Authorization: Bearer access_token
+```
 
 #### Request Body
 
@@ -395,5 +426,40 @@ Allows the user to update an existing purchase order. Accepts multiple line item
     }
   ]
 }
+```
+
+
+### Delete Purchase Order
+
+Allows the user to delete an existing purchase order with a purchase order ID.
+
+- **URL:** `/api/v1/purchase/order/{id}/`
+- **Method:** `DELETE`
+- **Security:**
+  - JWT Auth
+- **Path Parameter:**
+  - `id`: purchase order ID
+
+#### Header
+
+```
+Authorization: Bearer access_token
+```
+
+#### Response
+
+```json
+{
+  "message": "Purchase order deleted"
+}
+```
+
+
+## Testing
+Prerequisites: [Installation (Local test server)](#installation-local-test-server)    
+
+Open the root dir in the terminal and run the below command:
+```shell
+python manage.py test
 ```
 

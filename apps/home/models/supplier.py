@@ -1,6 +1,3 @@
-from django.db import models
-from lib.utils.model_functions import custom_id
-
 # ++++++++++++++++++++++
 # Schema: Supplier
 # ++++++++++++++++++++++
@@ -8,11 +5,15 @@ from lib.utils.model_functions import custom_id
 # name: string
 # email: string
 
+from django.db import models
+from lib.utils.model_functions import custom_id
+
+
 class Supplier(models.Model):
     """Supplier Model"""
 
     # class Meta:
-    #     unique_together = 'name', 'id' #, 'email'
+    #     unique_together = 'name', 'id', 'email'
 
     id = models.CharField(primary_key=True, unique=True, editable=False, default=custom_id, max_length=11)
     name = models.CharField(null=False, max_length=128)
@@ -38,6 +39,7 @@ class Supplier(models.Model):
         try:
             supplier = cls.objects.get(id=id)
         except Exception as excp:
+            _ = excp
             supplier = None
         return supplier
     

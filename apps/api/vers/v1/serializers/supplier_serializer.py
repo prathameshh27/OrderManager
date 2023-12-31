@@ -3,6 +3,7 @@ from apps.home.models.supplier import Supplier
 
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
+        """Properties"""
         model = Supplier
         # fields = '__all__'
         fields = ['id', 'name', 'email']
